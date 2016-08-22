@@ -31,42 +31,30 @@ import java.util.*;
 
 public class SqlFeaturesIterable implements Iterable<SqlFeatureContext> {
 
-    private static SqlFeaturesIterable instance = null;
     private static List<SqlFeatureContext> featuresList;
     private static final Splitter TAB_SPLITTER = Splitter.on("\t");
 
-    public static SqlFeaturesIterable getInstance() {
-        if (instance == null) {
-            instance = new SqlFeaturesIterable();
-        }
-        return instance;
-    }
-
-    private SqlFeaturesIterable() {
-        loadContextList();
-    }
-
-    private void loadContextList() {
-        try (InputStream sqlFeatures = SqlFeaturesIterable.class.getResourceAsStream("/sql_features.tsv");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(sqlFeatures, StandardCharsets.UTF_8))) {
+    public SqlFeaturesIterable() throws IOException {
+        try (InputStream sqlFeatures = SqlFeaturesIterable.class.getResourceAsStream("/sql_features.tsv")) {
             if (sqlFeatures == null) {
                 throw new ResourceNotFoundException("sql_features.tsv file not found");
             }
-            featuresList = new ArrayList<>();
-            SqlFeatureContext ctx;
-            String next;
-            while ((next = reader.readLine()) != null) {
-                List<String> parts = TAB_SPLITTER.splitToList(next);
-                ctx = new SqlFeatureContext(parts.get(0),
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(sqlFeatures, StandardCharsets.UTF_8))) {
+                featuresList = new ArrayList<>();
+                SqlFeatureContext ctx;
+                String next;
+                while ((next = reader.readLine()) != null) {
+                    List<String> parts = TAB_SPLITTER.splitToList(next);
+                    ctx = new SqlFeatureContext(parts.get(0),
                         parts.get(1),
                         parts.get(2),
                         parts.get(3),
                         parts.get(4).equals("YES"),
                         parts.get(5).isEmpty() ? null : parts.get(5),
                         parts.get(6).isEmpty() ? null : parts.get(6));
-                featuresList.add(ctx);
+                    featuresList.add(ctx);
+                }
             }
-        } catch (IOException e) {
         }
     }
 

@@ -36,6 +36,7 @@ import org.elasticsearch.cluster.ClusterService;
 import org.elasticsearch.common.inject.Inject;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Iterator;
 
 public class InformationSchemaIterables {
@@ -51,7 +52,7 @@ public class InformationSchemaIterables {
     @Inject
     public InformationSchemaIterables(final Schemas schemas,
                                       FulltextAnalyzerResolver ftResolver,
-                                      ClusterService clusterService) {
+                                      ClusterService clusterService) throws IOException {
         this.schemas = Suppliers.<Iterable<?>>ofInstance(schemas);
         FluentIterable<TableInfo> tablesIterable = FluentIterable.from(schemas)
                 .transformAndConcat(new Function<SchemaInfo, Iterable<TableInfo>>() {
@@ -96,7 +97,7 @@ public class InformationSchemaIterables {
                         return input != null;
                     }
                 }));
-        featuresGetter = Suppliers.<Iterable<?>>ofInstance(SqlFeaturesIterable.getInstance());
+        featuresGetter = Suppliers.<Iterable<?>>ofInstance(new SqlFeaturesIterable());
     }
 
     public Supplier<Iterable<?>> schemas() {
