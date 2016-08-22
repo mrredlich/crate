@@ -68,7 +68,7 @@ public class TableStatsService extends AbstractComponent implements Runnable {
         super(settings);
         this.clusterService = clusterService;
         this.transportSQLAction = transportSQLAction;
-        threadPool.scheduleWithFixedDelay(this, updateInterval);
+        //threadPool.scheduleWithFixedDelay(this, updateInterval);
     }
 
     @Override
